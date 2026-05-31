@@ -21,24 +21,20 @@ except ImportError:
     print("\n[!] Missing dependency. Run: pip install requests\n")
     sys.exit(1)
 
-# ─── COLORS ──────────────────────────────────────────────────────────────────
-
 class C:
-    R   = '\033[31m'       # red
-    BR  = '\033[91m'       # bright red
-    DR  = '\033[38;5;88m'  # dark red
-    OR  = '\033[38;5;202m' # orange
-    YW  = '\033[93m'       # yellow
-    GR  = '\033[32m'       # green
-    BGG = '\033[92m'       # bright green
-    CY  = '\033[36m'       # cyan
-    WH  = '\033[97m'       # white
-    GRY = '\033[38;5;240m' # gray
-    RS  = '\033[0m'        # reset
-    BO  = '\033[1m'        # bold
-    DIM = '\033[2m'        # dim
-
-# ─── CONFIG ──────────────────────────────────────────────────────────────────
+    R   = '\033[31m'
+    BR  = '\033[91m'
+    DR  = '\033[38;5;88m'
+    OR  = '\033[38;5;202m'
+    YW  = '\033[93m'
+    GR  = '\033[32m'
+    BGG = '\033[92m'
+    CY  = '\033[36m'
+    WH  = '\033[97m'
+    GRY = '\033[38;5;240m'
+    RS  = '\033[0m'
+    BO  = '\033[1m'
+    DIM = '\033[2m'
 
 CONFIG_DIR  = os.path.expanduser('~/.config/heresy')
 CONFIG_FILE = os.path.join(CONFIG_DIR, 'config.json')
@@ -93,8 +89,6 @@ def setup_wizard():
     print(f"\n  {C.BGG}✓ Configuration saved to {CONFIG_FILE}{C.RS}\n")
     time.sleep(1)
 
-# ─── BANNER ──────────────────────────────────────────────────────────────────
-
 def banner():
     return (
 f"""{C.BO}{C.DR}
@@ -109,8 +103,6 @@ f"""{C.BO}{C.DR}
   "Nothing escapes judgment."
   ─────────────────────────────────────────────────{C.RS}"""
     )
-
-# ─── INPUT DETECTION ─────────────────────────────────────────────────────────
 
 def detect_type(target):
     t = target.strip()
@@ -134,8 +126,6 @@ TYPE_LABELS = {
     'email':  'Email Address',
     'domain': 'Domain / URL',
 }
-
-# ─── API MODULES ─────────────────────────────────────────────────────────────
 
 def api_abuseipdb(ip, key):
     if not key:
@@ -213,7 +203,6 @@ def api_ipinfo(ip, token=''):
         return {'_error': str(e)}
 
 def api_dns_lookup(domain):
-    """Basic DNS info without external API"""
     import socket
     try:
         clean = re.sub(r'^https?://', '', domain).split('/')[0]
@@ -221,8 +210,6 @@ def api_dns_lookup(domain):
         return {'resolved_ip': ip, 'hostname': clean}
     except Exception as e:
         return {'_error': str(e)}
-
-# ─── RENDERING ───────────────────────────────────────────────────────────────
 
 def bar(value, total=100, width=20, fill='█', empty='░'):
     filled = round((value / max(total, 1)) * width)
@@ -250,7 +237,6 @@ def render_results(target, ttype, results, cfg):
     threat_score = 0  # 0=clean, 1=suspicious, 2=malicious
     verdict_reasons = []
 
-    # ── AbuseIPDB ──
     if 'abuseipdb' in results:
         d = results['abuseipdb']
         print(section('ABUSEIPDB'))
@@ -276,7 +262,6 @@ def render_results(target, ttype, results, cfg):
                 threat_score = max(threat_score, 1)
                 verdict_reasons.append(f"AbuseIPDB: {score}% suspicious activity")
 
-    # ── VirusTotal ──
     if 'virustotal' in results:
         d = results['virustotal']
         print(section('VIRUSTOTAL'))
@@ -301,7 +286,6 @@ def render_results(target, ttype, results, cfg):
                 threat_score = max(threat_score, 1)
                 verdict_reasons.append(f"VirusTotal: {mal} engines flagged as suspicious")
 
-    # ── IPInfo / DNS ──
     geo_key = 'ipinfo' if 'ipinfo' in results else 'dns'
     if geo_key in results:
         d = results[geo_key]
@@ -323,7 +307,6 @@ def render_results(target, ttype, results, cfg):
                 if key in d:
                     print(kv(label, d[key]))
 
-    # ── VERDICT ──
     verdicts = [
         (C.BGG, '███  CLEAN      ███', 'No threats detected across all sources.'),
         (C.YW,  '███  SUSPICIOUS ███', 'Possible threat — investigate further.'),
@@ -338,8 +321,6 @@ def render_results(target, ttype, results, cfg):
         for r in verdict_reasons:
             print(f"  {C.DR}           ▸ {C.GRY}{r}{C.RS}")
     print(f"\n  {C.GRY}{'═'*52}{C.RS}\n")
-
-# ─── MAIN ────────────────────────────────────────────────────────────────────
 
 def clear():
     os.system('clear' if os.name != 'nt' else 'cls')
@@ -417,7 +398,6 @@ examples:
         setup_wizard()
         return
 
-    # First run check
     if not cfg['abuseipdb'] and not cfg['virustotal']:
         clear()
         print(banner())
