@@ -16,7 +16,6 @@ Feed it an IP, a domain, a file hash. It consults the abyss — **AbuseIPDB**, *
 
 `CLEAN` · `SUSPICIOUS` · `MALICIOUS`
 
-No mercy.
 
 ---
 
